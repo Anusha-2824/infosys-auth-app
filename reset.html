@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset Password</title>
+</head>
+
+<body bgcolor="black" style="color:white; font-family:Arial">
+
+<center>
+<h2>Reset Password</h2>
+
+<table bgcolor="#1e1e1e" cellpadding="15">
+<tr>
+<td>
+<label>New Password *</label><br>
+<input type="password" id="newPass">
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<input type="button" value="Reset Password" onclick="resetPassword()">
+</td>
+</tr>
+</table>
+
+<p id="msg" style="color:lightgreen"></p>
+
+</center>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let resetEmail = localStorage.getItem("resetEmail");
+
+function resetPassword() {
+    const newPassword = document.getElementById("newPass").value;
+
+    if (!resetEmail) {
+        document.getElementById("msg").innerText =
+            "Invalid or expired reset request";
+        return;
+    }
+
+    users = users.map(u => {
+        if (u.email === resetEmail) {
+            u.password = newPassword;
+        }
+        return u;
+    });
+
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.removeItem("resetEmail");
+
+    document.getElementById("msg").innerText =
+        "Password reset successful";
+
+    setTimeout(() => {
+        window.location.href = "index.html";
+    }, 1500);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="auth-box">
+  <h2>Admin Dashboard</h2>
+
+  <h3>Create Employee Account</h3>
+
+  <input type="text" id="emp-username" placeholder="Employee Username">
+  <input type="password" id="emp-password" placeholder="Password">
+  <input type="email" id="emp-email" placeholder="Email">
+
+  <button onclick="createEmployee()">Create Employee</button>
+
+  <p id="admin-msg"></p>
+
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

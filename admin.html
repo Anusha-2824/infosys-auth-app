@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+</head>
+
+<body style="background-color:black; color:white; font-family:Arial;">
+
+<center>
+    <h1>Admin Dashboard</h1>
+    <p id="welcome"></p>
+
+    <hr width="60%" color="gray">
+
+    <!-- ================= CREATE EMPLOYEE ================= -->
+    <h2>Create Employee Account</h2>
+
+    <table style="background:#1e1e1e; padding:15px; border-radius:10px;">
+        <tr>
+            <td>
+                <label>Username</label><br>
+                <input type="text" id="empUser">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Password</label><br>
+                <input type="password" id="empPass">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Email</label><br>
+                <input type="email" id="empEmail">
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <button onclick="createEmployee()">Create Employee</button>
+            </td>
+        </tr>
+    </table>
+
+    <p id="createMsg" style="color:lightgreen"></p>
+
+    <hr width="60%" color="gray">
+
+    <!-- ================= LOCKED USERS ================= -->
+    <h2>Locked User Accounts</h2>
+
+    <table border="1" cellpadding="10"
+           style="border-collapse:collapse; background-color:#1e1e1e; color:white;">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="lockTable"></tbody>
+    </table>
+
+    <br><br>
+
+    <button onclick="logout()"
+            style="padding:8px 20px; background:#333; color:white; border:none;">
+        Logout
+    </button>
+</center>
+
+<script>
+/* ================= SESSION CHECK ================= */
+let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+if (!currentUser || currentUser.role !== "ADMIN") {
+    alert("Unauthorized access");
+    window.location.href = "index.html";
+}
+
+document.getElementById("welcome").innerText =
+    "Welcome, Admin (" + currentUser.username + ")";
+
+/* ================= CREATE EMPLOYEE ================= */
+function createEmployee() {
+    const username = empUser.value;
+    const password = empPass.value;
+    const email = empEmail.value;
+
+    if (!username || !password || !email) {
+        createMsg.innerText = "All fields are required";
+        return;
+    }
+
+    if (users.find(u => u.username === username)) {
+        createMsg.innerText = "User already exists";
+        return;
+    }
+
+    users.push({
+        username: username,
+        password: password,
+        email: email,
+        role: "EMPLOYEE",
+        failedAttempts: 0,
+        locked: false
+    });
+
+    localStorage.setItem("users", JSON.stringify(users));
+    createMsg.innerText = "Employee account created successfully";
+
+    empUser.value = "";
+    empPass.value = "";
+    empEmail.value = "";
+}
+
+/* ================= LOAD LOCKED USERS ================= */
+function loadLockedUsers() {
+    const table = document.getElementById("lockTable");
+    table.innerHTML = "";
+
+    let found = false;
+
+    users.forEach((u, index) => {
+        if (u.locked) {
+            found = true;
+            table.innerHTML += `
+                <tr>
+                    <td>${u.username}</td>
+                    <td>${u.email}</td>
+                    <td>${u.role}</td>
+                    <td>
+                        <button onclick="unlockUser(${index})">
+                            Unlock
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+    });
+
+    if (!found) {
+        table.innerHTML = `
+            <tr>
+                <td colspan="4" align="center">
+                    No locked users
+                </td>
+            </tr>
+        `;
+    }
+}
+
+/* ================= UNLOCK USER ================= */
+function unlockUser(index) {
+    users[index].locked = false;
+    users[index].failedAttempts = 0;
+    localStorage.setItem("users", JSON.stringify(users));
+    loadLockedUsers();
+}
+
+/* ================= LOGOUT ================= */
+function logout() {
+    localStorage.removeItem("currentUser");
+    window.location.href = "index.html";
+}
+
+loadLockedUsers();
+</script>
+
+</body>
+</html>

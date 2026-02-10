@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Forgot Password</title>
+</head>
+
+<body style="background-color:black; color:white; font-family:Arial;">
+
+<center>
+    <h2>Forgot Password</h2>
+
+    <table style="background:#1e1e1e; padding:20px; border-radius:10px;">
+        <tr>
+            <td>
+                <label>Registered Email *</label><br>
+                <input type="email" id="fpEmail" style="width:220px; padding:8px;">
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center">
+                <input type="button" value="Send Reset Link"
+                       onclick="sendLink()" style="padding:8px 15px;">
+            </td>
+        </tr>
+    </table>
+
+    <p id="msg" style="color:red; margin-top:15px;"></p>
+    <p id="linkBox" style="margin-top:10px;"></p>
+</center>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+function sendLink() {
+    const email = fpEmail.value;
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+        msg.innerText = "Email not registered";
+        return;
+    }
+
+    // Save reset info with expiry
+    const resetData = {
+        email: email,
+        expiresAt: Date.now() + (5 * 60 * 1000) // 5 minutes
+    };
+
+    localStorage.setItem("resetData", JSON.stringify(resetData));
+
+    msg.innerText = "Reset link generated (valid for 5 minutes)";
+
+    linkBox.innerHTML =
+        `<a href="reset.html" style="color:lightgreen">
+            Click here to reset password
+         </a>`;
+}
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Dashboard</title>
+</head>
+<body bgcolor="black" style="color:white">
+
+<h1>Employee Dashboard</h1>
+<p>Welcome Employee 👷</p>
+
+<button onclick="logout()">Logout</button>
+
+<script>
+function logout() {
+    localStorage.removeItem("currentUser");
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

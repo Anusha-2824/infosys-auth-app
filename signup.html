@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventra Signup</title>
+</head>
+
+<body style="background-color:black; color:white; font-family:Arial;">
+
+<center>
+<h1>Create Account</h1>
+
+<table style="background:#1e1e1e; padding:20px; border-radius:10px;">
+<tr>
+<td>
+<label>Username *</label><br>
+<input type="text" id="suUser">
+</td>
+</tr>
+
+<tr>
+<td>
+<label>Password *</label><br>
+<input type="password" id="suPass">
+</td>
+</tr>
+
+<tr>
+<td>
+<label>Email *</label><br>
+<input type="email" id="suEmail">
+</td>
+</tr>
+
+<tr>
+<td>
+<label>Role *</label><br>
+<select id="suRole">
+    <option value="EMPLOYEE">Employee</option>
+    <option value="ADMIN">Admin</option>
+</select>
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<input type="button" value="Create Account" onclick="signup()">
+<input type="button" value="Back to Login" onclick="goLogin()">
+</td>
+</tr>
+</table>
+
+<p id="msg" style="color:lightgreen"></p>
+</center>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+function signup() {
+    const u = document.getElementById("suUser").value;
+    const p = document.getElementById("suPass").value;
+    const e = document.getElementById("suEmail").value;
+    const r = document.getElementById("suRole").value;
+
+    if (!u || !p || !e) {
+        document.getElementById("msg").innerText =
+            "All fields are required";
+        return;
+    }
+
+    if (users.find(x => x.username === u)) {
+        document.getElementById("msg").innerText =
+            "User already exists";
+        return;
+    }
+
+    users.push({
+        username: u,
+        password: p,
+        email: e,
+        role: r,
+        failedAttempts: 0,
+        locked: false
+    });
+
+    localStorage.setItem("users", JSON.stringify(users));
+
+    document.getElementById("msg").innerText =
+        "Account created successfully";
+}
+
+function goLogin() {
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

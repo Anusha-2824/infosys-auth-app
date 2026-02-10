@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventra Login</title>
+</head>
+
+<body bgcolor="black" style="color:white; font-family:Arial">
+
+<center>
+<h1>Inventra Login</h1>
+
+<form onsubmit="return loginCheck()">
+<table bgcolor="#1e1e1e" cellpadding="15">
+
+<tr>
+<td>
+<label>Username *</label><br>
+<input type="text" id="loginUser" required>
+</td>
+</tr>
+
+<tr>
+<td>
+<label>Password *</label><br>
+<input type="password" id="loginPass" required>
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<input type="submit" value="Login">
+<input type="button" value="Sign Up" onclick="goSignup()">
+<input type="button" value="Forgot Password" onclick="goForgot()">
+</td>
+</tr>
+
+</table>
+</form>
+
+<p id="loginMsg" style="color:red"></p>
+</center>
+
+<script>
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+function loginCheck() {
+    const u = loginUser.value;
+    const p = loginPass.value;
+
+    const user = users.find(x => x.username === u);
+
+    if (!user) {
+        loginMsg.innerText = "Invalid username or password";
+        return false;
+    }
+
+    if (user.locked) {
+        loginMsg.innerText = "Account locked. Contact admin.";
+        return false;
+    }
+
+    if (user.password !== p) {
+        user.failedAttempts = (user.failedAttempts || 0) + 1;
+
+        if (user.failedAttempts >= 3) {
+            user.locked = true;
+            loginMsg.innerText = "Account locked after 3 failed attempts";
+        } else {
+            loginMsg.innerText =
+                `Invalid password (${user.failedAttempts}/3)`;
+        }
+
+        localStorage.setItem("users", JSON.stringify(users));
+        return false;
+    }
+
+    user.failedAttempts = 0;
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    localStorage.setItem("users", JSON.stringify(users));
+
+    if (user.role === "ADMIN") {
+        window.location.href = "admin.html";
+    } else {
+        window.location.href = "employee.html";
+    }
+
+    return false;
+}
+
+/* ✅ ADD THESE TWO FUNCTIONS */
+function goSignup() {
+    window.location.href = "signup.html";
+}
+
+function goForgot() {
+    window.location.href = "forgot.html";
+}
+</script>
+
+
+
+</body>
+</html>
