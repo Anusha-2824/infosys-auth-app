@@ -178,3 +178,4 @@ function logout() {
   currentUser = null;
   window.location.href = "index.html";
 }
+

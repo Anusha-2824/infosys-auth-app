@@ -4,88 +4,85 @@
     <title>Inventra Signup</title>
 </head>
 
-<body style="background-color:black; color:white; font-family:Arial;">
+<body bgcolor="black" style="color:white; font-family:Arial">
 
 <center>
 <h1>Create Account</h1>
 
-<table style="background:#1e1e1e; padding:20px; border-radius:10px;">
-<tr>
-<td>
-<label>Username *</label><br>
-<input type="text" id="suUser">
-</td>
-</tr>
+<form onsubmit="return registerUser()">
+<table bgcolor="#1e1e1e" cellpadding="15">
 
 <tr>
 <td>
-<label>Password *</label><br>
-<input type="password" id="suPass">
+<label>Username *</label><br>
+<input type="text" id="username" required>
 </td>
 </tr>
 
 <tr>
 <td>
 <label>Email *</label><br>
-<input type="email" id="suEmail">
+<input type="email" id="email" required>
+</td>
+</tr>
+
+<tr>
+<td>
+<label>Password *</label><br>
+<input type="password" id="password" required>
 </td>
 </tr>
 
 <tr>
 <td>
 <label>Role *</label><br>
-<select id="suRole">
-    <option value="EMPLOYEE">Employee</option>
-    <option value="ADMIN">Admin</option>
+<select id="role">
+    <option value="EMPLOYEE">EMPLOYEE</option>
+    <option value="ADMIN">ADMIN</option>
 </select>
 </td>
 </tr>
 
 <tr>
 <td align="center">
-<input type="button" value="Create Account" onclick="signup()">
+<input type="submit" value="Register">
 <input type="button" value="Back to Login" onclick="goLogin()">
 </td>
 </tr>
-</table>
 
-<p id="msg" style="color:lightgreen"></p>
+</table>
+</form>
+
+<p id="msg" style="color:red"></p>
+
 </center>
 
 <script>
-let users = JSON.parse(localStorage.getItem("users")) || [];
+async function registerUser() {
 
-function signup() {
-    const u = document.getElementById("suUser").value;
-    const p = document.getElementById("suPass").value;
-    const e = document.getElementById("suEmail").value;
-    const r = document.getElementById("suRole").value;
+    const username = document.getElementById("username").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
 
-    if (!u || !p || !e) {
-        document.getElementById("msg").innerText =
-            "All fields are required";
-        return;
-    }
-
-    if (users.find(x => x.username === u)) {
-        document.getElementById("msg").innerText =
-            "User already exists";
-        return;
-    }
-
-    users.push({
-        username: u,
-        password: p,
-        email: e,
-        role: r,
-        failedAttempts: 0,
-        locked: false
+    const response = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `username=${username}&email=${email}&password=${password}&role=${role}`
     });
 
-    localStorage.setItem("users", JSON.stringify(users));
+    const result = await response.text();
 
-    document.getElementById("msg").innerText =
-        "Account created successfully";
+    if (!response.ok) {
+        msg.innerText = result;
+        return false;
+    }
+
+    alert("Registration Successful! Please login.");
+    window.location.href = "index.html";
+    return false;
 }
 
 function goLogin() {

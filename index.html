@@ -30,7 +30,6 @@
 <td align="center">
 <input type="submit" value="Login">
 <input type="button" value="Sign Up" onclick="goSignup()">
-<input type="button" value="Forgot Password" onclick="goForgot()">
 </td>
 </tr>
 
@@ -38,63 +37,60 @@
 </form>
 
 <p id="loginMsg" style="color:red"></p>
+
 </center>
 
 <script>
-let users = JSON.parse(localStorage.getItem("users")) || [];
 
-function loginCheck() {
-    const u = loginUser.value;
-    const p = loginPass.value;
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("JS Loaded");
 
-    const user = users.find(x => x.username === u);
+    const form = document.querySelector("form");
 
-    if (!user) {
-        loginMsg.innerText = "Invalid username or password";
-        return false;
-    }
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();   // 🔥 This is important
 
-    if (user.locked) {
-        loginMsg.innerText = "Account locked. Contact admin.";
-        return false;
-    }
+        console.log("Form Submitted");
 
-    if (user.password !== p) {
-        user.failedAttempts = (user.failedAttempts || 0) + 1;
+        const username = document.getElementById("loginUser").value;
+        const password = document.getElementById("loginPass").value;
 
-        if (user.failedAttempts >= 3) {
-            user.locked = true;
-            loginMsg.innerText = "Account locked after 3 failed attempts";
-        } else {
-            loginMsg.innerText =
-                `Invalid password (${user.failedAttempts}/3)`;
+        try {
+
+            const response = await fetch("http://localhost:8080/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+            });
+
+            const result = await response.text();
+
+            console.log("Status:", response.status);
+            console.log("Response:", result);
+
+            if (!response.ok) {
+                document.getElementById("loginMsg").innerText = result;
+                return;
+            }
+
+            localStorage.setItem("token", result);
+            console.log("Token saved");
+
+            window.location.href = "dashboard.html";
+
+        } catch (error) {
+            document.getElementById("loginMsg").innerText = "Server not reachable";
         }
 
-        localStorage.setItem("users", JSON.stringify(users));
-        return false;
-    }
+    });
+});
 
-    user.failedAttempts = 0;
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    localStorage.setItem("users", JSON.stringify(users));
-
-    if (user.role === "ADMIN") {
-        window.location.href = "admin.html";
-    } else {
-        window.location.href = "employee.html";
-    }
-
-    return false;
-}
-
-/* ✅ ADD THESE TWO FUNCTIONS */
 function goSignup() {
     window.location.href = "signup.html";
 }
 
-function goForgot() {
-    window.location.href = "forgot.html";
-}
 </script>
 
 
